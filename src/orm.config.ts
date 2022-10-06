@@ -1,27 +1,27 @@
 import { Options } from '@mikro-orm/core';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import path from 'path';
-
-import config from './config';
+import { noEntityFoundError } from './utils/extensions';
 
 export default {
-  debug: true,
   migrations: {
-    path: path.join(__dirname, "migrations"),
-    tableName: "migrations",
+    path: path.join(__dirname, 'migrations'),
+    tableName: 'migrations',
     transactional: true,
     pattern: /^[\w-]+\d+\.(ts|js)$/,
     disableForeignKeys: false,
-    emit: "js",
+    emit: 'js',
   },
-  type: "postgresql",
+  type: 'postgresql',
   tsNode: true,
-  entitiesTs: [path.join(process.cwd(), "**", "*.entity.ts")],
-  entities: [path.join(process.cwd(), "**", "*.entity.ts")],
-  user: config.postgres.user,
-  password: config.postgres.password,
-  dbName: config.postgres.db,
-  host: config.postgres.host,
-  port: config.postgres.port,
+  entities: [path.join(process.cwd(), '**', '*.entity.ts')],
+  entitiesTs: [path.join(process.cwd(), '**', '*.entity.ts')],
+  user: 'root',
+  password: 'root',
+  dbName: 'example',
+  host: 'localhost',
+  port: 5432,
   ssl: false,
+  findOneOrFailHandler: noEntityFoundError,
+  debug: true,
 } as Options<PostgreSqlDriver>;

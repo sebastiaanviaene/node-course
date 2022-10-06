@@ -1,6 +1,7 @@
-import { Exclude, Expose } from 'class-transformer';
-import { IsOptional, IsString } from 'class-validator';
+import { Exclude, Expose } from "class-transformer";
+import { IsOptional, IsString } from "class-validator";
 
+// search.query.ts
 @Exclude()
 export class SearchQuery {
   @Expose()
