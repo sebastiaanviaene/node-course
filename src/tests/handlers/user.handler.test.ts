@@ -4,11 +4,11 @@ import { expect } from 'chai'
 import { NextFunction, Request, Response } from 'express';
 import { Authorized } from 'routing-controllers';
 import { App } from '../../app';
-import { create } from '../../controllers/users/handlers/create.handler';
-import { deleteUser } from '../../controllers/users/handlers/delete.handler';
-import { get } from '../../controllers/users/handlers/get.handler';
-import { getList } from '../../controllers/users/handlers/getList.handler';
-import { update } from '../../controllers/users/handlers/update.handler';
+import { create } from '../../controllers/users/handlers/user.create.handler';
+import { deleteUser } from '../../controllers/users/handlers/user.delete.handler';
+import { get } from '../../controllers/users/handlers/user.get.handler';
+import { getList } from '../../controllers/users/handlers/user.getList.handler';
+import { update } from '../../controllers/users/handlers/user.update.handler';
 import { User } from '../../entities/user.entity';
 import ormConfig from '../../orm.config';
 import { v4 } from 'uuid';
@@ -54,7 +54,7 @@ describe('Handler tests', () => {
 
       it('should search users', async () => {
         await RequestContext.createAsync(orm.em.fork(), async () => {
-          const [res, total] = await getList('test1');
+          const [res, total] = await getList({search: 'test1'});
           expect(res.some((x) => x.name === 'test1')).true;
         })
       });

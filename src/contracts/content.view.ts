@@ -1,11 +1,11 @@
 import { Nested } from '@panenco/papi';
 import { Exclude, Expose } from 'class-transformer';
-import { ValidateNested } from 'class-validator';
+import { BaseEntityView } from './baseEntity.view';
 import { FridgeView } from './fridge.view';
 import { ProductView } from './product.view';
 
 @Exclude()
-export class FridgecontentView {
+export class ContentView extends BaseEntityView{
   
   @Expose()
   @Nested(FridgeView)

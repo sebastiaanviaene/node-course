@@ -10,13 +10,13 @@ import { Fridge } from "../../entities/fridge.entity";
 import { Product } from "../../entities/product.entity";
 import { User } from "../../entities/user.entity";
 import { v4 } from 'uuid';
-import { Fridgecontent } from "../../entities/fridgecontent.entity";
 import { SearchQuery } from "../../contracts/search.query";
+import { ContentBody } from "../../contracts/content.body";
 
 // bootstrapping the server with supertest
 describe('Integration tests', () => {
   
-  describe('Fridgecontent Tests', () => {
+  describe('Content Tests', () => {
     let request: supertest.SuperTest<supertest.Test>;
     let orm: MikroORM<PostgreSqlDriver>;
 
@@ -32,7 +32,7 @@ describe('Integration tests', () => {
       await orm.getMigrator().up();
     });
 
-  it('should CRUD fridgecontents', async () => {
+  it('should CRUD contents', async () => {
 
     //create user
     const { body: createUserResponse } = await request
@@ -120,50 +120,41 @@ describe('Integration tests', () => {
 
       //put non-existing product in fridge
       await request
-      .post(`/api/fridgecontents`)
+      .post(`/api/contents`)
       .send({
-        product: {
-          id: v4(),
-          name: productTomato.name,
-          owner: productTomato.owner,
-          size: productTomato.size
-        },
-        fridge: fridgeBedroom
-      } as Fridgecontent)
+        productId: v4(),
+        fridgeId: fridgeBedroom.id
+      } as ContentBody)
       .set('x-auth',user0token)
       .expect(StatusCode.notFound)
 
       //put product in non-existing fridge
       await request
-      .post(`/api/fridgecontents`)
+      .post(`/api/contents`)
       .send({
-        product: productTomato,
-        fridge: {
-          id: v4(),
-          location: fridgeBedroom.location,
-          capacity: fridgeBedroom.capacity
-        }
-      } as Fridgecontent)
+        productId: productTomato.id,
+        fridgeId: v4()
+      } as ContentBody)
       .set('x-auth',user0token)
       .expect(StatusCode.notFound)
 
-      //trying to put a product in a fridge that isnt owned by user
+      //trying to put a product in a fridge that is not owned by user
       await request
-      .post(`/api/fridgecontents`)
+      .post(`/api/contents`)
       .send({
-        product: productTomato,
-        fridge: fridgeBedroom
-      } as Fridgecontent)
+        productId: productTomato.id,
+        fridgeId: fridgeBedroom.id
+      } as ContentBody)
       .set('x-auth',user1token)
       .expect(StatusCode.unauthorized)
 
       //putting product in fridge
       const {body: createContentResponse} = await request
-      .post(`/api/fridgecontents`)
+      .post(`/api/contents`)
       .send({
-        product: productTomato,
-        fridge: fridgeBedroom
-      } as Fridgecontent)
+        productId: productTomato.id,
+        fridgeId: fridgeBedroom.id
+      } as ContentBody)
       .set('x-auth',user0token)
       .expect(201)
       const res = createContentResponse.fridge;
@@ -172,49 +163,49 @@ describe('Integration tests', () => {
 
       //trying to put a product in a fridge that doesnt has the capacity
       await request
-      .post(`/api/fridgecontents`)
+      .post(`/api/contents`)
       .send({
-        product: productChonk,
-        fridge: fridgeBedroom
-      } as Fridgecontent)
+        productId: productChonk.id,
+        fridgeId: fridgeBedroom.id
+      } as ContentBody)
       .set('x-auth',user1token)
       .expect(StatusCode.forbidden)
 
       //trying to put a product in thats already stored in a fridge
       await request
-      .post(`/api/fridgecontents`)
+      .post(`/api/contents`)
       .send({
-        product: productTomato,
-        fridge: fridgeMancave
-      } as Fridgecontent)
+        productId: productTomato.id,
+        fridgeId: fridgeMancave.id
+      } as ContentBody)
       .set('x-auth',user0token)
       .expect(StatusCode.forbidden)
 
     //get content by productId as owner
     const { body: getContentResponse } = await request
-    .get(`/api/fridgecontents/${createContentResponse.product.id}`)
+    .get(`/api/contents/${createContentResponse.product.id}`)
     .set('x-auth',user0token)
     .expect(200);
     expect(createContentResponse.name === getContentResponse.name).true;
 
     //get product by id as not the owner
     const { body: getContentResponse2 } = await request
-    .get(`/api/fridgecontents/${createContentResponse.product.id}`)
+    .get(`/api/contents/${createContentResponse.product.id}`)
     .set('x-auth',user1token)
     .expect(200);
     expect(createContentResponse.name === getContentResponse2.name).true;
 
     //get list of users stored contents
     const {body: getListResponse} = await request
-    .get(`/api/fridgecontents/`)
+    .get(`/api/contents/`)
     .set('x-auth',user1token)
     .query({search: 'mancave'} as SearchQuery)
     .expect(200)
     expect(getListResponse.count===0).true
 
-    // //search with location that doesnt have contents
+    // //search with location that does not have contents
     const {body: getListResponse2} = await request
-    .get(`/api/fridgecontents/`)
+    .get(`/api/contents/`)
     .set('x-auth',user0token)
     .query({search: 'mancave'} as SearchQuery)
     .expect(200)
@@ -222,14 +213,14 @@ describe('Integration tests', () => {
     
     // //getList without search query
     const {body: getListResponse3} = await request
-    .get(`/api/fridgecontents/`)
+    .get(`/api/contents/`)
     .set('x-auth',user0token)
     .expect(200)
     expect(getListResponse3.count===1).true
 
     // //getList with search query about product
     const {body: getListResponse4} = await request
-    .get(`/api/fridgecontents/`)
+    .get(`/api/contents/`)
     .set('x-auth',user0token)
     .query({search: 'tomato'} as SearchQuery)
     .expect(200)
@@ -257,30 +248,30 @@ describe('Integration tests', () => {
 
     //try putting item in fully stocked fridge
     await request
-      .post(`/api/fridgecontents`)
+      .post(`/api/contents`)
       .send({
-        product: productTea,
-        fridge: fridgeBedroom
-      } as Fridgecontent)
+        productId: productTea.id,
+        fridgeId: fridgeBedroom.id
+      } as ContentBody)
       .set('x-auth',user1token)
       .expect(StatusCode.forbidden)
 
     //put products in fridge
     await request
-      .post(`/api/fridgecontents`)
+      .post(`/api/contents`)
       .send({
-        product: productTea,
-        fridge: fridgeMancave
-      } as Fridgecontent)
+        productId: productTea.id,
+        fridgeId: fridgeMancave.id
+      } as ContentBody)
       .set('x-auth',user1token)
       .expect(201)
     
     await request
-      .post(`/api/fridgecontents`)
+      .post(`/api/contents`)
       .send({
-        product: productSnack,
-        fridge: fridgeMancave
-      } as Fridgecontent)
+        productId: productSnack.id,
+        fridgeId: fridgeMancave.id
+      } as ContentBody)
       .set('x-auth',user1token)
       .expect(201)
 
@@ -291,7 +282,7 @@ describe('Integration tests', () => {
       .expect(204)
     
     await request
-      .get(`/api/fridgecontents/${productTea.id}`)
+      .get(`/api/contents/${productTea.id}`)
       .set('x-auth',user1token)
       .expect(404)
 
@@ -302,19 +293,19 @@ describe('Integration tests', () => {
       .expect(204)
 
     await request
-      .get(`/api/fridgecontents/${productSnack.id}`)
+      .get(`/api/contents/${productSnack.id}`)
       .set('x-auth',user1token)
       .expect(404)
 
     //trying to delete content as not the owner -> should not be allowed
     await request
-      .delete(`/api/fridgecontents/${productTomato.id}`)
+      .delete(`/api/contents/${productTomato.id}`)
       .set('x-auth',user1token)
       .expect(StatusCode.unauthorized)
 
     // //delete content as the owner
     await request
-      .delete(`/api/fridgecontents/${productTomato.id}`)
+      .delete(`/api/contents/${productTomato.id}`)
       .set('x-auth',user0token)
       .expect(StatusCode.noContent)
     

@@ -6,7 +6,6 @@ import { expect } from "chai";
 import supertest from "supertest";
 import { App } from "../../app";
 import { LoginBody } from "../../contracts/login.body";
-import { Fridge } from "../../entities/fridge.entity";
 import { User } from "../../entities/user.entity";
 
 // bootstrapping the server with supertest

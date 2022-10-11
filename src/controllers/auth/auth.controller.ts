@@ -1,8 +1,8 @@
 import { Body, Representer } from "@panenco/papi";
-import { Authorized, JsonController, Post } from "routing-controllers";
-import { AccessTokenView } from "../../contracts/accesstoken.view";
+import { JsonController, Post } from "routing-controllers";
+import { AccessTokenView } from "../../contracts/accessToken.view";
 import { LoginBody } from "../../contracts/login.body";
-import { createToken } from "./handlers/login.handler";
+import { createToken } from "./handlers/auth.login.handler";
 
 
 @JsonController('/auth')

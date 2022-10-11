@@ -1,8 +1,8 @@
-import { getList } from './handlers/getList.handler';
-import { create } from './handlers/create.handler';
-import { get } from './handlers/get.handler';
-import { update } from './handlers/update.handler';
-import { deleteFridge } from './handlers/delete.handler';
+import { getList } from './handlers/fridge.getList.handler';
+import { create } from './handlers/fridge.create.handler';
+import { get } from './handlers/fridge.get.handler';
+import { update } from './handlers/fridge.update.handler';
+import { deleteFridge } from './handlers/fridge.delete.handler';
 import { Authorized, Delete, Get, JsonController, Param, Patch, Post, UseBefore } from 'routing-controllers';
 import { Body, ListRepresenter, Query, Representer, StatusCode } from '@panenco/papi';
 import { SearchQuery } from '../../contracts/search.query';
@@ -34,7 +34,7 @@ export class FridgeController {
     async getList(
       @Query() query: SearchQuery
     ){
-      const [fridges, total] = await getList(query.search)
+      const [fridges, total] = await getList(query)
       return [fridges, total];
     }
 

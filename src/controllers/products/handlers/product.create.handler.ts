@@ -1,6 +1,5 @@
 import { RequestContext } from "@mikro-orm/core";
 import { getAccessTokenData } from "@panenco/papi";
-import { IsJWT } from "class-validator";
 import { Request } from "express";
 import { ProductBody } from "../../../contracts/product.body";
 import { Product } from "../../../entities/product.entity";

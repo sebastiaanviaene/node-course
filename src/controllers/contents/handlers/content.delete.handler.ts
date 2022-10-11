@@ -1,14 +1,13 @@
 import { RequestContext } from "@mikro-orm/core";
 import { getAccessTokenData, NotFound, Unauthorized } from "@panenco/papi";
-import e, { Request } from "express";
-import { Fridge } from "../../../entities/fridge.entity";
-import { Fridgecontent } from "../../../entities/fridgecontent.entity";
+import { Request } from "express";
+import { Content } from "../../../entities/content.entity";
 import { Product } from "../../../entities/product.entity";
 
 export const deleteContent = async (productId: string, request: Request) => {
 
     const em = RequestContext.getEntityManager();
-    const content = await em.findOneOrFail(Fridgecontent, {product: productId});
+    const content = await em.findOneOrFail(Content, {product: productId});
     if (!content) {
         throw new NotFound('contentNotFound', 'Product not in fridge');
     }

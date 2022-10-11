@@ -1,4 +1,3 @@
-// update.handler.ts
 import { RequestContext } from '@mikro-orm/core';
 import { Forbidden, getAccessTokenData, NotFound, Unauthorized } from '@panenco/papi';
 import { Request } from 'express';

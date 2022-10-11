@@ -1,17 +1,16 @@
 import { NextFunction, Request, Response, Router } from 'express';
 
-import { getList } from './handlers/getList.handler';
-import { create } from './handlers/create.handler';
-import { get } from './handlers/get.handler';
-import { update } from './handlers/update.handler';
-import { deleteUser } from './handlers/delete.handler';
+import { getList } from './handlers/user.getList.handler';
+import { create } from './handlers/user.create.handler';
+import { get } from './handlers/user.get.handler';
+import { update } from './handlers/user.update.handler';
+import { deleteUser } from './handlers/user.delete.handler';
 import { UserBody } from '../../contracts/user.body';
 import { Authorized, Delete, Get, JsonController, Param, Patch, Post, UseBefore } from 'routing-controllers';
 import { Body, ListRepresenter, Query, Representer, StatusCode } from '@panenco/papi';
 import { SearchQuery } from '../../contracts/search.query';
 import { UserView } from '../../contracts/user.view';
 import { OpenAPI } from 'routing-controllers-openapi';
-import { v4 } from 'uuid';
 
 const adminMiddleware = (req, res, next) => {
     if (req.header("x-auth") != "api-key") {
@@ -43,7 +42,7 @@ export class UserController {
     async getList(
       @Query() query: SearchQuery
     ){
-      const [users, total] = await getList(query.search)
+      const [users, total] = await getList(query)
       return [users, total];
     }
 

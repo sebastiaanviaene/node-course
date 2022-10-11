@@ -1,15 +1,14 @@
-import { getList } from './handlers/getList.handler';
-import { create } from './handlers/create.handler';
-import { get } from './handlers/get.handler';
-import { update } from './handlers/update.handler';
-import { deleteRecipe } from './handlers/delete.handler';
+import { getList } from './handlers/recipe.getList.handler';
+import { create } from './handlers/recipe.create.handler';
+import { get } from './handlers/recipe.get.handler';
+import { update } from './handlers/recipe.update.handler';
+import { deleteRecipe } from './handlers/recipe.delete.handler';
 import { RecipeBody } from '../../contracts/recipe.body';
 import { Authorized, Delete, Get, JsonController, Param, Patch, Post, UseBefore } from 'routing-controllers';
 import { Body, ListRepresenter, Query, Representer, StatusCode } from '@panenco/papi';
 import { SearchQuery } from '../../contracts/search.query';
 import { RecipeView } from '../../contracts/recipe.view';
 import { OpenAPI } from 'routing-controllers-openapi';
-import { v4 } from 'uuid';
 
 @JsonController("/recipes")
 export class RecipeController {
@@ -34,7 +33,7 @@ export class RecipeController {
     async getList(
       @Query() query: SearchQuery
     ){
-      const [recipes, total] = await getList(query.search)
+      const [recipes, total] = await getList(query)
       return [recipes, total];
     }
 

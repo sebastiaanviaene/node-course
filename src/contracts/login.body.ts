@@ -5,7 +5,6 @@ import { IsEmail, IsString, Length } from "class-validator";
 export class LoginBody {
 
     @Expose()
-    // We can start adding validation decorators that specify exactly what we expect from the object we will be validating
     @IsEmail()
     public email: string;
 

@@ -4,7 +4,7 @@ import { Fridge } from "./fridge.entity";
 import { Product } from "./product.entity";
 
 @Entity()
-export class Fridgecontent extends BaseEntity<Fridgecontent,'id'> {
+export class Content extends BaseEntity<Content,'id'> {
 
     @PrimaryKey({columnType: 'uuid'})
     public id: string = v4();

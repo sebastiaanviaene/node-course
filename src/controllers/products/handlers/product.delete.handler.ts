@@ -1,7 +1,7 @@
 import { RequestContext } from "@mikro-orm/core";
 import { Forbidden, getAccessTokenData, NotFound } from "@panenco/papi";
 import { Request } from "express";
-import { Fridgecontent } from "../../../entities/fridgecontent.entity";
+import { Content } from "../../../entities/content.entity";
 import { Product } from "../../../entities/product.entity";
 
 export const deleteProduct = async (id: string, request: Request) => {
@@ -19,7 +19,7 @@ export const deleteProduct = async (id: string, request: Request) => {
     }
 
     //if the product was stored in the fridge, it should also be removed from there
-    const content = await em.findOne(Fridgecontent, {product: id});
+    const content = await em.findOne(Content, {product: id});
     if (content) {
         em.remove(content);
     }

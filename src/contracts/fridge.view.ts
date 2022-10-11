@@ -1,7 +1,5 @@
 import { Exclude, Expose } from 'class-transformer';
-import { IsArray, IsNumber, IsString } from 'class-validator';
-import v4 from 'uuid';
-import { Product } from '../entities/product.entity';
+import { IsNumber, IsString } from 'class-validator';
 
 @Exclude()
 export class FridgeView {

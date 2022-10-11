@@ -1,8 +1,7 @@
 //user.body.ts
 
 import { Exclude, Expose } from 'class-transformer';
-import { IsArray, isArray, IsNumber, IsString } from 'class-validator';
-import { Product } from '../entities/product.entity';
+import { IsNumber, IsString } from 'class-validator';
 
 // For safety we'll exclude everything from being transformed by placing a @Exclude() decorator on the class declaration
 @Exclude()

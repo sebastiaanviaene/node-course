@@ -1,53 +1,49 @@
-import { getList } from './handlers/getList.handler';
-import { create } from './handlers/create.handler';
-import { get } from './handlers/get.handler';
-import { deleteContent } from './handlers/delete.handler';
-import { Authorized, Delete, Get, JsonController, Param, Patch, Post, Req } from 'routing-controllers';
+import { getList } from './handlers/content.getList.handler';
+import { create } from './handlers/content.create.handler';
+import { get } from './handlers/content.get.handler';
+import { deleteContent } from './handlers/content.delete.handler';
+import { Authorized, Delete, Get, JsonController, Param, Post, Req } from 'routing-controllers';
 import { Body, ListRepresenter, Query, Representer, StatusCode } from '@panenco/papi';
 import { SearchQuery } from '../../contracts/search.query';
 import { OpenAPI } from 'routing-controllers-openapi';
-import { v4 } from 'uuid';
-import { FridgecontentBody } from '../../contracts/fridgecontent.body';
-import { FridgecontentView } from '../../contracts/fridgecontent.view';
+import { ContentBody } from '../../contracts/content.body';
+import { ContentView as ContentView } from '../../contracts/content.view';
 import { Request } from 'express';
 
-@JsonController("/fridgecontents")
-export class FridgeContentController {
+@JsonController("/contents")
+export class ContentController {
     
     @Post()
     @Authorized()
     @OpenAPI({summary: 'Put product in fridge'})
-    @Representer(FridgecontentView, StatusCode.created)
+    @Representer(ContentView, StatusCode.created)
     async create(
-      @Body() body: FridgecontentBody,
+      @Body() body: ContentBody,
       @Req() request: Request
     ){
-      const content = await create(body, request);
-      return content;
+      return create(body, request);
     }
 
     @Get()
     @Authorized()
     @OpenAPI({summary: 'get list of contents',description: 'returns all products stored in fridges relevant for the provided search query. Only returns owners own products if requested'})
-    @ListRepresenter(FridgecontentView)
+    @ListRepresenter(ContentView)
     async getList(
       @Req() request: Request,
       @Query() query: SearchQuery,
     ){
-      const [contents, total] = await getList(query.search, request)
-      return [contents, total];
+      return getList(query, request)
     }
 
 
     @Get('/:id')
     @Authorized()
     @OpenAPI({summary: 'Returns contents with the given productId'})
-    @Representer(FridgecontentView)
+    @Representer(ContentView)
     async get(
       @Param('id') id: string
     ){
-      const content = await get(id);
-      return content;
+      return await get(id);
     }
 
     @Delete('/:id')

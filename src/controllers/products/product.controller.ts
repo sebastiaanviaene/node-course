@@ -1,14 +1,14 @@
-import { getList } from './handlers/getList.handler';
-import { create } from './handlers/create.handler';
-import { get } from './handlers/get.handler';
-import { update } from './handlers/update.handler';
+import { getList } from './handlers/product.getList.handler';
+import { create } from './handlers/product.create.handler';
+import { get } from './handlers/product.get.handler';
+import { update } from './handlers/product.update.handler';
 import { Authorized, Delete, Get, JsonController, Param, Patch, Post, Req, UseBefore } from 'routing-controllers';
-import { Body, getAccessTokenData, ListRepresenter, Query, Representer, StatusCode } from '@panenco/papi';
+import { Body, ListRepresenter, Query, Representer, StatusCode } from '@panenco/papi';
 import { SearchQuery } from '../../contracts/search.query';
 import { OpenAPI } from 'routing-controllers-openapi';
 import { ProductView } from '../../contracts/product.view';
 import { ProductBody } from '../../contracts/product.body';
-import { deleteProduct } from './handlers/delete.handler';
+import { deleteProduct } from './handlers/product.delete.handler';
 import { Request } from 'express';
 
 @JsonController("/products")
@@ -35,7 +35,7 @@ export class ProductController {
     async getList(
       @Query() query: SearchQuery
     ){
-      const [products, total] = await getList(query.search)
+      const [products, total] = await getList(query)
       return [products, total];
     }
 

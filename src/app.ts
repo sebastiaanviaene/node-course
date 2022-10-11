@@ -13,7 +13,7 @@ import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { RecipeController } from './controllers/recipes/recipe.controller';
 import { FridgeController } from './controllers/fridges/fridge.controller';
 import { ProductController } from './controllers/products/product.controller';
-import { FridgeContentController } from './controllers/fridgecontents/fridgecontent.controller';
+import { ContentController } from './controllers/contents/content.controller';
 
 export class App {
     public orm: MikroORM<PostgreSqlDriver>;
@@ -29,7 +29,7 @@ export class App {
         this.host.use((req, __, next: NextFunction) => {
             RequestContext.create(this.orm.em, next);
           });
-        this.initializeControllers([UserController, AuthController, RecipeController, FridgeController, ProductController, FridgeContentController]);
+        this.initializeControllers([UserController, AuthController, RecipeController, FridgeController, ProductController, ContentController]);
         this.initializeSwagger();
         this.host.use(errorMiddleware);
 
