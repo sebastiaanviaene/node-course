@@ -28,8 +28,8 @@ export const create = async (body: ContentBody, request: Request) => {
   }
 
   //checking if fridge has enough space left
-  const fridgeSpace = await getFridgeSpace(em, fridge.id);
-  if (fridgeSpace+prod.size > fridge.capacity) {
+  const fridgeSpace = await getFridgeSpace(em, fridge);
+  if (fridgeSpace < prod.size) {
       throw new Forbidden('overCapacity', 'Not enough capacity left in fridge to store product');
   }
   
@@ -55,13 +55,13 @@ const contentStored = async (em: EntityManager, productId: string): Promise<bool
   return !!content;
 }
 
-const getFridgeSpace = async (em: EntityManager, fridgeId: string): Promise<number> => {
+const getFridgeSpace = async (em: EntityManager, fridge: Fridge): Promise<number> => {
 
   const qb: {sum: number} = await em.createQueryBuilder(Content,'c')
     .select('sum(p.size)')
     .join('c.product', 'p')
-    .where({fridge: {id: fridgeId}})
+    .where({fridge:fridge.id})
     .execute("get")
-  return qb.sum;
+  return fridge.capacity-qb.sum;
 }
 

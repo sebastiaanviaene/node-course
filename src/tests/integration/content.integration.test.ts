@@ -310,6 +310,5 @@ describe('Integration tests', () => {
       .expect(StatusCode.noContent)
     
     });
-
   });
-  });
+});
