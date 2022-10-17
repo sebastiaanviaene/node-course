@@ -1,20 +1,16 @@
-import { getList } from './handlers/product.getList.handler';
-import { create } from './handlers/product.create.handler';
-import { get } from './handlers/product.get.handler';
-import { update } from './handlers/product.update.handler';
-import { Authorized, Delete, Get, JsonController, Param, Patch, Post, Req, UseBefore } from 'routing-controllers';
+import { getProductList, createProduct, deleteProduct, getProduct, updateProduct } from './handlers/product.handlers';
+import { Authorized, Delete, Get, JsonController, Param, Patch, Post, Req} from 'routing-controllers';
 import { Body, ListRepresenter, Query, Representer, StatusCode } from '@panenco/papi';
 import { SearchQuery } from '../../contracts/search.query';
 import { OpenAPI } from 'routing-controllers-openapi';
 import { ProductView } from '../../contracts/product.view';
 import { ProductBody } from '../../contracts/product.body';
-import { deleteProduct } from './handlers/product.delete.handler';
 import { Request } from 'express';
+import { productOwnerRequirement } from '../../utils/authorization/productOwner.requirement';
 
 @JsonController("/products")
 export class ProductController {
     
-    //Adding product to the database
     @Post()
     @Authorized()
     @OpenAPI({summary: 'Create a new product'})
@@ -23,11 +19,9 @@ export class ProductController {
       @Body() body: ProductBody,
       @Req() request: Request
     ){
-      const product = await create( body, request);
-      return product;
+      return await createProduct(request.token.userId, body);
     }
 
-    //This action returns all products
     @Get()
     @Authorized()
     @OpenAPI({summary: 'returns all products relevant for the provided search query'})
@@ -35,11 +29,9 @@ export class ProductController {
     async getList(
       @Query() query: SearchQuery
     ){
-      const [products, total] = await getList(query)
-      return [products, total];
+      return await getProductList(query);
     }
 
-    //This action returns product with the given id
     @Get('/:id')
     @Authorized()
     @OpenAPI({summary: 'Returns product with the given id'})
@@ -47,13 +39,12 @@ export class ProductController {
     async get(
       @Param('id') id: string
     ){
-      const product = await get(id);
-      return product;
+      return await getProduct(id);
     }
 
-    //Updating info of product with the given id
+    //needs requirement
     @Patch('/:id')
-    @Authorized()
+    @Authorized(productOwnerRequirement)
     @OpenAPI({summary: 'Updates info of product with the given id'})
     @Representer(ProductView)
     async update(
@@ -61,21 +52,18 @@ export class ProductController {
       @Req() request: Request,
       @Body({}, {skipMissingProperties: true}) body: ProductBody
     ){
-      const product = await update(id, request, body)
-      return product;
+      return await updateProduct(id, body);
     }
 
-
-    //Removing product with the given id from the database
+    //needs requirement
     @Delete('/:id')
-    @Authorized()
+    @Authorized(productOwnerRequirement)
     @OpenAPI({summary: 'Deletes product with the given id'})
     @Representer(null, StatusCode.noContent)
     async delete(
       @Param('id') id: string,
       @Req() request: Request
     ){
-      await deleteProduct(id, request);
+      await deleteProduct(id);
     }
-
 }

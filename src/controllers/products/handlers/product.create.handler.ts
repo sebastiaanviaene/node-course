@@ -1,18 +1,13 @@
 import { RequestContext } from "@mikro-orm/core";
-import { getAccessTokenData } from "@panenco/papi";
-import { Request } from "express";
 import { ProductBody } from "../../../contracts/product.body";
 import { Product } from "../../../entities/product.entity";
 
 
-export const create = async (body: ProductBody, request: Request) => {
-  const token = request.headers['x-auth'] as string;
-  const tokenData = getAccessTokenData(token,'secretSecretStuff');
-  body["owner"] = tokenData.userId;
+export const createProduct = async (userId: string, productBody: ProductBody) => {
+  productBody["owner"] = userId;
   const em = RequestContext.getEntityManager();
-  const product = em.create(Product, body);
+  const product = em.create(Product, productBody);
   await em.persistAndFlush(product);
-
   return product;
 };
 

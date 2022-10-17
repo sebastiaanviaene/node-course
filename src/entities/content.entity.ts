@@ -9,11 +9,10 @@ export class Content extends BaseEntity<Content,'id'> {
     @PrimaryKey({columnType: 'uuid'})
     public id: string = v4();
 
-    @ManyToOne(() => Fridge, {wrappedReference: true})
+    @ManyToOne(() => Fridge, {wrappedReference: true, onDelete: 'cascade'})
     public fridge: Fridge;
 
-
-    @ManyToOne(() => Product, {wrappedReference: true})
+    @ManyToOne(() => Product, {wrappedReference: true, onDelete: 'cascade'})
     public product: Product;
 
 }

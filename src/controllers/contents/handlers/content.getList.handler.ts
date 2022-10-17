@@ -1,29 +1,21 @@
 import { RequestContext } from "@mikro-orm/core";
-import { getAccessTokenData } from "@panenco/papi";
-import { Request } from "express";
 import { SearchQuery } from "../../../contracts/search.query";
-import { Content } from "../../../entities/content.entity";
+import { Content } from "../../../entities/entityIndex";
 
-export const getList = async (query: SearchQuery, request: Request) => {
+export const getContentList = async (userId: string, query: SearchQuery) => {
     const em = RequestContext.getEntityManager();
-    const data = request.token;
-    const token = request.headers['x-auth'] as string;
-    const tokenData = getAccessTokenData(token,'secretSecretStuff');
+    const searchFilter = query && query.search && 
+        {$or: [
+              { product: {name: { $ilike: `%${query.search}%`}}},
+              { fridge: {location: { $ilike: `%${query.search}%`}}}
+          ]};
     return await em.findAndCount(
       Content,
       {
-        $and: [
-          {product: {owner: `${tokenData.userId}`}},
-          {...(query && query.search
-            && {$or: [
-              { product: {name: { $ilike: `%${query.search}%`}}},
-              { fridge: {location: { $ilike: `%${query.search}%`}}}
-          ]})},
-        ]
-    },
-      //{populate: ['fridge', 'product', 'product']}
+          product: {owner: `${userId}`},
+          ...(searchFilter),
+      },
     );
-    
 };
 
 

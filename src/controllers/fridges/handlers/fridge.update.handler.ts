@@ -1,19 +1,13 @@
 // update.handler.ts
 import { RequestContext } from '@mikro-orm/core';
-import { NotFound } from '@panenco/papi';
 import { FridgeBody } from '../../../contracts/fridge.body';
-import { Fridge } from '../../../entities/fridge.entity';
+import { Fridge } from '../../../entities/entityIndex';
 
-export const update = async (id: string, body: FridgeBody) => {
+export const updateFridge = async (fridgeId: string, fridgeBody: FridgeBody) => {
 
   const em = RequestContext.getEntityManager();
-  const fridge = await em.findOneOrFail(Fridge,{id});
-
-  if (!fridge) {
-    throw new NotFound('fridgeNotFound', 'Fridge not found');
-  }
-
-  fridge.assign(body);
+  const fridge = await em.findOneOrFail(Fridge,{id: fridgeId});
+  fridge.assign(fridgeBody);
   await em.flush();
   return fridge; 
 };

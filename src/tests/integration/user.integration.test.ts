@@ -7,6 +7,7 @@ import supertest from "supertest";
 import { App } from "../../app";
 import { LoginBody } from "../../contracts/login.body";
 import { User } from "../../entities/user.entity";
+import { initDB } from "../helpers/initDB";
 
 // bootstrapping the server with supertest
 describe('Integration tests', () => {
@@ -22,8 +23,7 @@ describe('Integration tests', () => {
       })
       
       beforeEach(async () => {
-        await orm.em.execute(`DROP SCHEMA public CASCADE; CREATE SCHEMA public`);
-        await orm.getMigrator().up();
+        await initDB(orm);
       });
 
     it('should CRUD users', async () => {

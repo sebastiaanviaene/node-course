@@ -1,13 +1,9 @@
 import { RequestContext } from "@mikro-orm/core";
-import { NotFound } from "@panenco/papi";
 import { Recipe } from "../../../entities/recipe.entity";
 
-export const deleteRecipe = async (id: string) => {
+export const deleteRecipe = async (recipeId: string) => {
 
     const em = RequestContext.getEntityManager();
-    const recipe = await em.findOneOrFail(Recipe, {id});
-    if (!recipe) {
-        throw new NotFound('recipeNotFound', 'Recipe not found');
-    }
+    const recipe = await em.findOneOrFail(Recipe, {id: recipeId});
     await em.removeAndFlush(recipe);
   };

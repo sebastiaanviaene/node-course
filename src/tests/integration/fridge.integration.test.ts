@@ -6,8 +6,8 @@ import { expect } from "chai";
 import supertest from "supertest";
 import { App } from "../../app";
 import { LoginBody } from "../../contracts/login.body";
-import { Fridge } from "../../entities/fridge.entity";
-import { User } from "../../entities/user.entity";
+import { Fridge } from "../../entities/entityIndex";
+import { initDB, initFridges, initUsers } from "../helpers/helperIndex";
 
 // bootstrapping the server with supertest
 describe('Integration tests', () => {
@@ -15,6 +15,7 @@ describe('Integration tests', () => {
     describe('Fridge Tests', () => {
       let request: supertest.SuperTest<supertest.Test>;
       let orm: MikroORM<PostgreSqlDriver>;
+      let fridges: Fridge[];
 
       before(async () => {
         const app = new App();
@@ -24,30 +25,18 @@ describe('Integration tests', () => {
       })
       
       beforeEach(async () => {
-        await orm.em.execute(`DROP SCHEMA public CASCADE; CREATE SCHEMA public`);
-        await orm.getMigrator().up();
+        await initDB(orm);
+        await initUsers(orm);
+        fridges = await initFridges(orm);
       });
 
     it('should CRUD fridges', async () => {
 
-      //create new user
-
-      //create user
-      const { body: createUserResponse } = await request
-      .post(`/api/users`)
-      .send({
-        name: 'user0',
-        email: 'user0@email.com',
-        password: 'weakpassword'
-      } as User)
-      .set('x-auth','api-key')
-      .expect(StatusCode.created);
-
       const { body: loginResponse } = await request
       .post(`/api/auth/tokens`)
       .send({
-        email: 'user0@email.com',
-        password: 'weakpassword'
+        email: 'test-user+1@panenco.com',
+        password: 'password1'
       } as LoginBody);
       const token = loginResponse.token;
 
@@ -55,48 +44,69 @@ describe('Integration tests', () => {
       const { body: createFridgeResponse } = await request
       .post(`/api/fridges`)
       .send({
-        location: 'mancave',
-        capacity: 50
-      } as Fridge)
+        location: 'veranda',
+        capacity: 30
+        } as Fridge)
       .set('x-auth',token)
       .expect(StatusCode.created);
-      expect(createFridgeResponse.location === 'mancave').true;
-      expect(createFridgeResponse.capacity === 50);
+      expect(createFridgeResponse.location === 'veranda').true;
+      expect(createFridgeResponse.capacity === 30);
 
       //get fridge by id
+      const [{id}] = fridges;
       const { body: getResponse } = await request
-      .get(`/api/fridges/${createFridgeResponse.id}`)
+      .get(`/api/fridges/${id}`)
       .set('x-auth',token)
       .expect(200);
       expect(createFridgeResponse.name === getResponse.name).true;
 
       //updating location of fridge
-      const testLocation = 'sadLonelyBasement'
       const { body : updateResponse} = await request
-      .patch(`/api/fridges/${createFridgeResponse.id}`)
+      .patch(`/api/fridges/${id}`)
       .set('x-auth',token)
       .send({
-        location: testLocation
+        location: 'sadLonelyBasement'
       } as Fridge)
       .expect(200)
-      
-      expect(updateResponse.location === testLocation);
-      expect(updateResponse.id === createFridgeResponse.id);
-      expect(updateResponse.capacity === createFridgeResponse.capacity)
+      expect(updateResponse.location === 'sadLonelyBasement');
+      expect(updateResponse.capacity === fridges[0].capacity)
       
       //deleting fridge
       await request
-      .delete(`/api/fridges/`+createFridgeResponse.id)
+      .delete(`/api/fridges/`+id)
       .set('x-auth',token)
       .expect(StatusCode.noContent)
-      
+    });
+
+    it('should not CRUD fridges without authorization', async () => {
+
+      //create fridge
       await request
-      .get(`/api/fridges/`+createFridgeResponse.id)
-      .set('x-auth',token)
-      .expect(StatusCode.notFound);
+      .post(`/api/fridges`)
+      .send({
+        location: 'veranda',
+        capacity: 30
+        } as Fridge)
+      .expect(StatusCode.unauthorized);
 
+      //get fridge by id
+      const [{id}] = fridges;
+      await request
+      .get(`/api/fridges/${id}`)
+      .expect(StatusCode.unauthorized);
 
-      });
-
+      //updating location of fridge
+      await request
+      .patch(`/api/fridges/${id}`)
+      .send({
+        location: 'sadLonelyBasement'
+      } as Fridge)
+      .expect(StatusCode.unauthorized)
+      
+      //deleting fridge
+      await request
+      .delete(`/api/fridges/`+id)
+      .expect(StatusCode.unauthorized)
     });
   });
+});

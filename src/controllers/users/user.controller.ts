@@ -1,10 +1,4 @@
-import { NextFunction, Request, Response, Router } from 'express';
-
-import { getList } from './handlers/user.getList.handler';
-import { create } from './handlers/user.create.handler';
-import { get } from './handlers/user.get.handler';
-import { update } from './handlers/user.update.handler';
-import { deleteUser } from './handlers/user.delete.handler';
+import { getUserList, createUser, deleteUser, getUser, updateUser } from './handlers/user.handlers';
 import { UserBody } from '../../contracts/user.body';
 import { Authorized, Delete, Get, JsonController, Param, Patch, Post, UseBefore } from 'routing-controllers';
 import { Body, ListRepresenter, Query, Representer, StatusCode } from '@panenco/papi';
@@ -30,8 +24,7 @@ export class UserController {
     async create(
       @Body() body: UserBody
     ){
-      const user = await create(body);
-      return user;
+      return await createUser(body);
     }
 
     //This action returns all users
@@ -42,8 +35,7 @@ export class UserController {
     async getList(
       @Query() query: SearchQuery
     ){
-      const [users, total] = await getList(query)
-      return [users, total];
+      return await getUserList(query);
     }
 
     //This action returns user with the given id
@@ -54,8 +46,7 @@ export class UserController {
     async get(
       @Param('id') id: string
     ){
-      const user = await get(id);
-      return user;
+      return await getUser(id);
     }
 
     //Updating info of user with the given id
@@ -67,8 +58,7 @@ export class UserController {
       @Param('id') id: string,
       @Body({}, {skipMissingProperties: true}) body: UserBody
     ){
-      const user = await update(id,body)
-      return user;
+      return await updateUser(id,body);
     }
 
     //Removing user with the given id from the database

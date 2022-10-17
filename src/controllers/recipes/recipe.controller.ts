@@ -1,8 +1,4 @@
-import { getList } from './handlers/recipe.getList.handler';
-import { create } from './handlers/recipe.create.handler';
-import { get } from './handlers/recipe.get.handler';
-import { update } from './handlers/recipe.update.handler';
-import { deleteRecipe } from './handlers/recipe.delete.handler';
+import { getRecipeList, createRecipe, deleteRecipe, getRecipe, updateRecipe } from './handlers/recipe.handlers';
 import { RecipeBody } from '../../contracts/recipe.body';
 import { Authorized, Delete, Get, JsonController, Param, Patch, Post, UseBefore } from 'routing-controllers';
 import { Body, ListRepresenter, Query, Representer, StatusCode } from '@panenco/papi';
@@ -13,7 +9,6 @@ import { OpenAPI } from 'routing-controllers-openapi';
 @JsonController("/recipes")
 export class RecipeController {
     
-    //Adding user to the database
     @Post()
     @Authorized()
     @OpenAPI({summary: 'Create a new recipe'})
@@ -21,11 +16,9 @@ export class RecipeController {
     async create(
       @Body() body: RecipeBody
     ){
-      const recipe = await create(body);
-      return recipe;
+      return await createRecipe(body);
     }
 
-    //This action returns all users
     @Get()
     @Authorized()
     @OpenAPI({summary: 'returns all recipes relevant for the provided search query'})
@@ -33,11 +26,9 @@ export class RecipeController {
     async getList(
       @Query() query: SearchQuery
     ){
-      const [recipes, total] = await getList(query)
-      return [recipes, total];
+      return await getRecipeList(query);
     }
 
-    //This action returns recipe with the given id
     @Get('/:id')
     @Authorized()
     @OpenAPI({summary: 'Returns recipe with the given id'})
@@ -45,11 +36,9 @@ export class RecipeController {
     async get(
       @Param('id') id: string
     ){
-      const recipe = await get(id);
-      return recipe;
+      return await getRecipe(id);
     }
 
-    //Updating info of recipe with the given id
     @Patch('/:id')
     @Authorized()
     @OpenAPI({summary: 'Updates info of recipe with the given id'})
@@ -58,11 +47,9 @@ export class RecipeController {
       @Param('id') id: string,
       @Body({}, {skipMissingProperties: true}) body: RecipeBody
     ){
-      const fridge = await update(id,body)
-      return fridge;
+      return await updateRecipe(id,body);
     }
 
-    //Removing recipe with the given id from the database
     @Delete('/:id')
     @Authorized()
     @OpenAPI({summary: 'Deletes recipe with the given id'})

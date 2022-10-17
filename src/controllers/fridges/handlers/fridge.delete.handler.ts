@@ -1,19 +1,9 @@
 import { RequestContext } from "@mikro-orm/core";
-import { NotFound } from "@panenco/papi";
-import { Fridge } from "../../../entities/fridge.entity";
-import { Content } from "../../../entities/content.entity";
+import { Fridge} from "../../../entities/entityIndex";
 
-export const deleteFridge = async (id: string) => {
+export const deleteFridge = async (fridgeId: string) => {
 
     const em = RequestContext.getEntityManager();
-    const fridge = await em.findOneOrFail(Fridge, {id});
-    if (!fridge) {
-        throw new NotFound('fridgeNotFound', 'Fridge not found');
-    }
-    const [contents, count] = await em.findAndCount(Content, {fridge: id});
-    for (const content of contents) {
-        em.remove(content)
-    }
-
+    const fridge = await em.findOneOrFail(Fridge, {id: fridgeId});
     await em.removeAndFlush(fridge);
   };

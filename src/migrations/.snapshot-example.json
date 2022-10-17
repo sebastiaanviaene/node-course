@@ -135,11 +135,11 @@
           "mappedType": "uuid"
         }
       },
-      "name": "fridgecontent",
+      "name": "content",
       "schema": "public",
       "indexes": [
         {
-          "keyName": "fridgecontent_pkey",
+          "keyName": "content_pkey",
           "columnNames": [
             "id"
           ],
@@ -150,28 +150,30 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "fridgecontent_fridge_id_foreign": {
-          "constraintName": "fridgecontent_fridge_id_foreign",
+        "content_fridge_id_foreign": {
+          "constraintName": "content_fridge_id_foreign",
           "columnNames": [
             "fridge_id"
           ],
-          "localTableName": "public.fridgecontent",
+          "localTableName": "public.content",
           "referencedColumnNames": [
             "id"
           ],
           "referencedTableName": "public.fridge",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         },
-        "fridgecontent_product_id_foreign": {
-          "constraintName": "fridgecontent_product_id_foreign",
+        "content_product_id_foreign": {
+          "constraintName": "content_product_id_foreign",
           "columnNames": [
             "product_id"
           ],
-          "localTableName": "public.fridgecontent",
+          "localTableName": "public.content",
           "referencedColumnNames": [
             "id"
           ],
           "referencedTableName": "public.product",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       }
